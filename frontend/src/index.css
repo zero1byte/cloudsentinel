@@ -1,0 +1,246 @@
+/* ==========================================================================
+   CloudSentinel design tokens (Tailwind CSS v4)
+
+   How this file is organised
+   1. Theme values   - raw CSS variables; dark is the default, light overrides
+   2. Tailwind map   - exposes those variables as utilities (bg-surface, ...)
+   3. Static tokens  - fonts, type scale, radius, shadows (same in both themes)
+   4. Base styles    - page background, text, focus ring, scrollbars
+
+   Switch theme by setting the attribute on <html>:
+     document.documentElement.dataset.theme = "light" | "dark"
+   (data-theme must be on <html> so the derived tints below resolve correctly)
+   ========================================================================== */
+
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter Variable", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+}
+
+/* --------------------------------------------------------------------------
+   1. THEME VALUES
+   -------------------------------------------------------------------------- */
+:root {
+  color-scheme: dark;
+
+  /* Surfaces: page -> card -> raised element */
+  --background: #0b1220;
+  --surface: #111a2e;
+  --surface-2: #17223b;
+  --border: #24324f;
+  --border-strong: #33456b;
+
+  /* Text */
+  --foreground: #e6ebf5;
+  --muted: #93a1bd;
+  --subtle: #64748b;
+
+  /* Brand / interaction */
+  --brand: #4f8cff;
+  --brand-hover: #75a5ff;
+  --brand-foreground: #07101f;
+  --ring: #4f8cff;
+
+  /* Severity: use ONLY for risk level, with a text label (never colour alone) */
+  --severity-critical: #ef4444;
+  --severity-high: #f97316;
+  --severity-medium: #f59e0b;
+  --severity-low: #2dd4bf;
+  --severity-info: #94a3b8;
+
+  /* Status */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+
+  /* Cloud provider accents: badges, legends, comparison charts only */
+  --provider-aws: #ff9900;
+  --provider-azure: #2f8cff;
+
+  /* Layout sizes (use as w-(--sidebar-width), h-(--topbar-height), ...) */
+  --sidebar-width: 15rem;
+  --sidebar-width-collapsed: 4rem;
+  --topbar-height: 3.5rem;
+  --content-max-width: 90rem;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --background: #f4f6fa;
+  --surface: #ffffff;
+  --surface-2: #eef2f8;
+  --border: #dbe2ee;
+  --border-strong: #c3cddf;
+
+  --foreground: #0f172a;
+  --muted: #4b5a75;
+  --subtle: #7384a1;
+
+  --brand: #2563eb;
+  --brand-hover: #1d4ed8;
+  --brand-foreground: #ffffff;
+  --ring: #2563eb;
+
+  --severity-critical: #dc2626;
+  --severity-high: #ea580c;
+  --severity-medium: #b45309;
+  --severity-low: #0f766e;
+  --severity-info: #64748b;
+
+  --success: #15803d;
+  --warning: #b45309;
+  --danger: #dc2626;
+
+  --provider-aws: #c77700;
+  --provider-azure: #0b63ce;
+}
+
+/* Derived tints (follow the active theme automatically) */
+:root {
+  --severity-critical-soft: color-mix(in srgb, var(--severity-critical) 16%, transparent);
+  --severity-high-soft: color-mix(in srgb, var(--severity-high) 16%, transparent);
+  --severity-medium-soft: color-mix(in srgb, var(--severity-medium) 16%, transparent);
+  --severity-low-soft: color-mix(in srgb, var(--severity-low) 16%, transparent);
+  --severity-info-soft: color-mix(in srgb, var(--severity-info) 16%, transparent);
+
+  --brand-soft: color-mix(in srgb, var(--brand) 14%, transparent);
+
+  /* MITRE ATT&CK heatmap scale: 0 = no detections ... 4 = many */
+  --heat-0: var(--surface-2);
+  --heat-1: color-mix(in srgb, var(--brand) 22%, var(--surface));
+  --heat-2: color-mix(in srgb, var(--brand) 45%, var(--surface));
+  --heat-3: color-mix(in srgb, var(--brand) 70%, var(--surface));
+  --heat-4: var(--brand);
+}
+
+/* --------------------------------------------------------------------------
+   2. TAILWIND MAP: variables -> utilities
+      e.g. bg-surface, text-muted, border-border, bg-severity-critical-soft
+   -------------------------------------------------------------------------- */
+@theme inline {
+  /* Optional: remove Tailwind's default palette to force use of tokens
+  --color-*: initial; */
+
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-soft: var(--brand-soft);
+  --color-ring: var(--ring);
+
+  --color-severity-critical: var(--severity-critical);
+  --color-severity-high: var(--severity-high);
+  --color-severity-medium: var(--severity-medium);
+  --color-severity-low: var(--severity-low);
+  --color-severity-info: var(--severity-info);
+  --color-severity-critical-soft: var(--severity-critical-soft);
+  --color-severity-high-soft: var(--severity-high-soft);
+  --color-severity-medium-soft: var(--severity-medium-soft);
+  --color-severity-low-soft: var(--severity-low-soft);
+  --color-severity-info-soft: var(--severity-info-soft);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  --color-aws: var(--provider-aws);
+  --color-azure: var(--provider-azure);
+
+  --color-heat-0: var(--heat-0);
+  --color-heat-1: var(--heat-1);
+  --color-heat-2: var(--heat-2);
+  --color-heat-3: var(--heat-3);
+  --color-heat-4: var(--heat-4);
+}
+
+/* --------------------------------------------------------------------------
+   3. STATIC TOKENS (same in both themes)
+   -------------------------------------------------------------------------- */
+@theme {
+  /* Fonts: self-hosted via @fontsource (no external CDN) */
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Type scale tuned for a dense dashboard.
+     NOTE: text-base is 14px here (Tailwind's default is 16px). */
+  --text-xs: 0.75rem;        /* 12px  badges, table meta */
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.8125rem;      /* 13px  table cells, secondary text */
+  --text-sm--line-height: 1.25rem;
+  --text-base: 0.875rem;     /* 14px  body */
+  --text-base--line-height: 1.375rem;
+  --text-lg: 1rem;           /* 16px  card titles */
+  --text-lg--line-height: 1.5rem;
+  --text-xl: 1.125rem;       /* 18px  section headings */
+  --text-xl--line-height: 1.625rem;
+  --text-2xl: 1.375rem;      /* 22px  page titles */
+  --text-2xl--line-height: 1.75rem;
+  --text-3xl: 1.75rem;       /* 28px  KPI numbers */
+  --text-3xl--line-height: 2.125rem;
+  --text-4xl: 2.25rem;       /* 36px  hero KPI */
+  --text-4xl--line-height: 2.5rem;
+
+  /* Corner radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.625rem;
+  --radius-xl: 0.875rem;
+
+  /* Elevation */
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.18), 0 1px 1px rgb(0 0 0 / 0.12);
+  --shadow-popover: 0 8px 24px rgb(0 0 0 / 0.35), 0 2px 6px rgb(0 0 0 / 0.2);
+}
+
+/* --------------------------------------------------------------------------
+   4. BASE STYLES
+   -------------------------------------------------------------------------- */
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Logs, IDs, IPs, ARNs: monospace and tabular figures */
+  code,
+  kbd,
+  pre,
+  samp {
+    font-family: var(--font-mono);
+    font-size: 0.92em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--brand) 35%, transparent);
+  }
+
+  /* Subtle scrollbars for tables and log panels */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+}

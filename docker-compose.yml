@@ -1,4 +1,23 @@
+# ---------------------------------------------------------------------------
+# CloudSentinel - local development stack
+#
+#   db        PostgreSQL 16 + pgvector   (events, alerts, incidents, embeddings)
+#   redis     Redis 7                    (queue / streaming between workers)
+#   api       FastAPI backend            http://localhost:8000  (auto-reload)
+#   frontend  React + Vite dev server    http://localhost:5173  (hot reload)
+#
+# Start:  docker compose up --build        Stop:  docker compose down
+
+#docker compose up --build        # start the whole stack
+#docker compose up -d             # later runs, in background
+#docker compose down              # stop (keeps database)
+#docker build -t cloudsentinel .  # production image: API + dashboard
+
+
+# ---------------------------------------------------------------------------
+
 services:
+  # ---- Database -------------------------------------------------------------
   db:
     image: pgvector/pgvector:pg16
     environment:
@@ -6,13 +25,14 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
       POSTGRES_DB: ${POSTGRES_DB:-cloudsentinel}
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
+      - pgdata:/var/lib/postgresql/data      # data survives container restarts
+    healthcheck:                             # api waits until this passes
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sentinel} -d ${POSTGRES_DB:-cloudsentinel}"]
       interval: 5s
       timeout: 5s
       retries: 10
 
+  # ---- Queue / cache ----------------------------------------------------------
   redis:
     image: redis:7-alpine
     healthcheck:
@@ -21,19 +41,43 @@ services:
       timeout: 3s
       retries: 10
 
+  # ---- Backend API ------------------------------------------------------------
   api:
-    build: .
+    build:
+      context: .
+      target: runtime                        # API only; skips the frontend build stage
     env_file: .env
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-sentinel}:${POSTGRES_PASSWORD:-change-me}@db:5432/${POSTGRES_DB:-cloudsentinel}
       REDIS_URL: redis://redis:6379/0
+      # CLOUDSENTINEL_CREDENTIALS_FILE: /app/.cloudsentinel/credentials.json
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend/app:/app/app               # edit code on your machine, API reloads
+      # Optional: share saved cloud credentials (read-only, never baked into the image)
+      # - ~/.cloudsentinel:/app/.cloudsentinel:ro
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
+
+  # ---- Frontend dev server ----------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    environment:
+      VITE_API_PROXY_TARGET: http://api:8000 # Vite forwards /api/* to the api container
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app                      # edit code on your machine, browser hot-reloads
+      - /app/node_modules                    # keep the container's node_modules, not the host's
+    depends_on:
+      - api
 
 volumes:
   pgdata:
