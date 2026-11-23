@@ -219,7 +219,7 @@ Run the API locally with hot reload, using only the database and Redis from Dock
 ```bash
 docker compose up -d db redis
 cd backend
-uvicorn app.main:app --reload
+ uvicorn app.main:app --reload --port 8000
 ```
 
 When you add a library, install it, add it to `backend/requirements.txt`, then rebuild the image:

@@ -1,9 +1,0 @@
-fastapi
-uvicorn[standard]
-pydantic
-sqlalchemy
-psycopg[binary]
-redis
-boto3
-azure-identity
-cryptography
