@@ -1,0 +1,15 @@
+fastapi[standard]
+pydantic-settings 
+boto3 
+azure-identity 
+azure-mgmt-resource 
+azure-monitor-query 
+sqlalchemy 
+alembic 
+psycopg[binary] 
+pyjwt[crypto] 
+authlib 
+celery 
+redis 
+httpx 
+pytest
