@@ -30,4 +30,7 @@ class CloudTrail:
 
         response = self.client.lookup_events(**params)
 
-        return response.get("Events", [])
+        return {
+            "events": response.get("Events", []),
+            "next_token": response.get("NextToken"),
+        }

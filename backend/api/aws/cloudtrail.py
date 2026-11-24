@@ -24,8 +24,8 @@ def retrieve_events(
 	end_time: Optional[datetime] = None,
 	next_token: Optional[str] = None,
 	max_results: int = Query(default=50, ge=1, le=50),
-) -> list[dict[str, Any]]:
-	"""Retrieve CloudTrail events with optional time and attribute filters."""
+) -> dict[str, Any]:
+	"""Retrieve a CloudTrail event page and its optional next-page token."""
 	try:
 		if lookup_attribute and "=" not in lookup_attribute:
 			raise HTTPException(
