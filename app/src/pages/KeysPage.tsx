@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { CircleCheck, Cloud, Eye, EyeOff, KeyRound, LoaderCircle, Plus, Save, Trash2 } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { addAccount, deleteAccount, getAccounts } from '../api/client'
 
@@ -68,7 +69,7 @@ export function KeysPage() {
               <p className="eyebrow">NEW CONNECTION</p>
               <h2>Add cloud account</h2>
             </div>
-            <span className="panel-icon" aria-hidden="true">＋</span>
+            <span className="panel-icon" aria-hidden="true"><Plus /></span>
           </div>
           <form className="account-form" onSubmit={handleSubmit}>
             <label>
@@ -103,6 +104,9 @@ export function KeysPage() {
             {formError && <p className="form-message error" role="alert">{formError}</p>}
             {createAccount.isSuccess && <p className="form-message success" role="status">Account added successfully.</p>}
             <button className="button button-primary full-width" type="submit" disabled={createAccount.isPending}>
+              {createAccount.isPending
+                ? <LoaderCircle className="icon-spin" aria-hidden="true" />
+                : <Save aria-hidden="true" />}
               {createAccount.isPending ? 'Saving account…' : 'Save cloud account'}
             </button>
             <p className="form-hint">Use read-only credentials with the least privileges needed.</p>
@@ -123,7 +127,7 @@ export function KeysPage() {
           {accountsQuery.isError && <p className="form-message error" role="alert">{accountsQuery.error.message}</p>}
           {accountsQuery.data?.length === 0 && (
             <div className="empty-state">
-              <span className="empty-icon" aria-hidden="true">◇</span>
+              <span className="empty-icon" aria-hidden="true"><KeyRound /></span>
               <strong>No accounts yet</strong>
               <span>Add a cloud account to get started.</span>
             </div>
@@ -137,12 +141,12 @@ export function KeysPage() {
                 return (
                   <article className="account-card" key={`${account.platform_name}-${account.key}`}>
                     <div className="account-card-top">
-                      <span className="provider-mark">{account.platform_name.slice(0, 1).toUpperCase()}</span>
+                      <span className="provider-mark" aria-hidden="true"><Cloud /></span>
                       <div className="account-title">
                         <strong>{account.platform_name}</strong>
                         <span>{account.date ? `Added ${new Date(account.date).toLocaleDateString()}` : 'Cloud connection'}</span>
                       </div>
-                      <span className="connected-badge"><span className="status-dot" /> Stored</span>
+                      <span className="connected-badge"><CircleCheck aria-hidden="true" /> Stored</span>
                     </div>
                     <div className="credential-row">
                       <span>Access key</span>
@@ -151,8 +155,14 @@ export function KeysPage() {
                     <div className="credential-row">
                       <span>Secret key</span>
                       <code>{isSecretVisible ? account.secret : '••••••••••••••••'}</code>
-                      <button className="text-button" type="button" onClick={() => toggleSecret(account.key)}>
-                        {isSecretVisible ? 'Hide' : 'Reveal'}
+                      <button
+                        aria-label={isSecretVisible ? 'Hide secret key' : 'Reveal secret key'}
+                        className="text-button"
+                        type="button"
+                        onClick={() => toggleSecret(account.key)}
+                      >
+                        {isSecretVisible ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
+                        <span>{isSecretVisible ? 'Hide' : 'Reveal'}</span>
                       </button>
                     </div>
                     <div className="account-actions">
@@ -162,6 +172,7 @@ export function KeysPage() {
                         disabled={removeAccount.isPending}
                         onClick={() => handleDeleteAccount(account.platform_name, account.key)}
                       >
+                        <Trash2 aria-hidden="true" />
                         {isDeleting ? 'Deleting…' : 'Delete credentials'}
                       </button>
                     </div>

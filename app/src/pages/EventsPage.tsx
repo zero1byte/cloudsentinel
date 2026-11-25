@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { Fragment, useMemo, useState, type FormEvent } from 'react'
+import { Braces, CircleCheck, ChevronDown, ChevronUp, ListFilter, ScrollText, SlidersHorizontal } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import { getCloudTrailEvents } from '../api/client'
 
@@ -78,7 +79,7 @@ export function EventsPage() {
           <h1>CloudTrail events</h1>
           <p className="page-description">Review recent activity and narrow the stream by event attributes or time.</p>
         </div>
-        <span className="live-tag"><span className="status-dot" /> CLOUDTRAIL</span>
+        <span className="live-tag"><CircleCheck aria-hidden="true" /> CLOUDTRAIL</span>
       </div>
 
       <section className="panel filters-panel">
@@ -87,6 +88,7 @@ export function EventsPage() {
             <p className="eyebrow">QUERY</p>
             <h2>Filter events</h2>
           </div>
+          <span className="panel-icon" aria-hidden="true"><ListFilter /></span>
         </div>
         <form className="filters-form" onSubmit={handleFilterSubmit}>
           <label className="lookup-filter">
@@ -113,7 +115,10 @@ export function EventsPage() {
               {[10, 25, 50].map((size) => <option key={size} value={size}>{size}</option>)}
             </select>
           </label>
-          <button className="button button-primary filter-button" type="submit">Apply filters</button>
+          <button className="button button-primary filter-button" type="submit">
+            <SlidersHorizontal aria-hidden="true" />
+            Apply filters
+          </button>
         </form>
       </section>
 
@@ -129,7 +134,7 @@ export function EventsPage() {
         {eventsQuery.isError && <p className="form-message error" role="alert">{eventsQuery.error.message}</p>}
         {eventsQuery.data && events.length === 0 && (
           <div className="empty-state">
-            <span className="empty-icon" aria-hidden="true">⌁</span>
+            <span className="empty-icon" aria-hidden="true"><ScrollText /></span>
             <strong>No events found</strong>
             <span>Try changing the filters or check your CloudTrail connection.</span>
           </div>
@@ -168,6 +173,7 @@ export function EventsPage() {
                               aria-expanded={expandedEvents.has(eventKey)}
                               onClick={() => toggleEventDetails(eventKey)}
                             >
+                              {expandedEvents.has(eventKey) ? <ChevronUp aria-hidden="true" /> : <Braces aria-hidden="true" />}
                               {expandedEvents.has(eventKey) ? 'Hide JSON' : 'View JSON'}
                             </button>
                           )}
@@ -197,6 +203,7 @@ export function EventsPage() {
               onClick={() => void eventsQuery.fetchNextPage()}
               disabled={eventsQuery.isFetchingNextPage}
             >
+              <ChevronDown aria-hidden="true" />
               {eventsQuery.isFetchingNextPage ? 'Loading more…' : 'Load more events'}
             </button>
           </div>

@@ -36,6 +36,38 @@ export interface CloudTrailEventsPage {
   next_token?: string | null
 }
 
+export interface S3LogObject {
+  key: string
+  size?: number
+  last_modified?: string
+  compressed: boolean
+  source: string
+  account?: string
+  region?: string
+  date?: string
+}
+
+export interface S3LogsPage {
+  total: number
+  offset: number
+  limit: number
+  has_more: boolean
+  items: S3LogObject[]
+}
+
+export interface S3LogContentPage {
+  key: string
+  source: string
+  account?: string
+  region?: string
+  date?: string
+  format: 'json' | 'text'
+  total: number
+  offset: number
+  limit: number
+  records: unknown[]
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
@@ -73,6 +105,29 @@ export function addAccount(account: Omit<CloudAccount, 'date'>) {
 export function getCloudTrailEvents(params: URLSearchParams) {
   const query = params.toString()
   return request<CloudTrailEventsPage>(`/cloudtrail/events${query ? `?${query}` : ''}`)
+}
+
+export function getS3Buckets() {
+  return request<string[]>('/s3/buckets')
+}
+
+export function getS3BucketLogs(bucketName: string, params = new URLSearchParams()) {
+  const query = params.toString()
+  return request<S3LogsPage>(
+    `/s3/buckets/${encodeURIComponent(bucketName)}/logs${query ? `?${query}` : ''}`,
+  )
+}
+
+export function getS3BucketLogContent(
+  bucketName: string,
+  key: string,
+  offset = 0,
+  limit = 100,
+) {
+  const params = new URLSearchParams({ key, offset: String(offset), limit: String(limit) })
+  return request<S3LogContentPage>(
+    `/s3/buckets/${encodeURIComponent(bucketName)}/logs/content?${params.toString()}`,
+  )
 }
 
 export function deleteAccount(key: string) {

@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from api import storekeys
 from api.aws import cloudtrail
+from api.aws import s3
 
 app = FastAPI(
     title="CloudSentinel API",
@@ -15,6 +16,12 @@ app.include_router(
 
 app.include_router(
     cloudtrail.router,
+    prefix="/api/v1"
+)
+
+
+app.include_router(
+    s3.router,
     prefix="/api/v1"
 )
 

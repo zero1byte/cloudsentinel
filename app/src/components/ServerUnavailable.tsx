@@ -1,3 +1,5 @@
+import { CircleAlert, RefreshCw } from 'lucide-react'
+
 interface ServerUnavailableProps {
   message: string
   onRetry: () => void
@@ -7,7 +9,7 @@ interface ServerUnavailableProps {
 export function ServerUnavailable({ message, onRetry, retrying }: ServerUnavailableProps) {
   return (
     <section className="server-unavailable" role="alert">
-      <span className="unavailable-icon" aria-hidden="true">!</span>
+      <span className="unavailable-icon" aria-hidden="true"><CircleAlert /></span>
       <p className="eyebrow">CONNECTION ISSUE</p>
       <h1>Server not reachable</h1>
       <p className="page-description">
@@ -15,6 +17,7 @@ export function ServerUnavailable({ message, onRetry, retrying }: ServerUnavaila
       </p>
       <p className="connection-error">{message}</p>
       <button className="button button-primary" type="button" onClick={onRetry} disabled={retrying}>
+        <RefreshCw className={retrying ? 'icon-spin' : undefined} aria-hidden="true" />
         {retrying ? 'Checking…' : 'Try again'}
       </button>
     </section>

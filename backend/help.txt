@@ -1,2 +1,5 @@
 pip install "fastapi[standard]" pydantic
 uvicorn main:app --reload
+
+AWS user needs these permission :
+    AmazonS3ReadOnlyAccess (IAM permission)

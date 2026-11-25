@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { getServerHealth } from '../api/client'
 import { Footer } from './Footer'
 import { Header } from './Header'
+import { Sidebar } from './Sidebar'
 import { ServerUnavailable } from './ServerUnavailable'
 import type { Theme } from '../theme'
 
@@ -12,6 +14,7 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ theme, onThemeChange }: AppLayoutProps) {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const healthQuery = useQuery({
     queryKey: ['server-health'],
     queryFn: getServerHealth,
@@ -24,17 +27,20 @@ export function AppLayout({ theme, onThemeChange }: AppLayoutProps) {
   return (
     <div className="app-shell">
       <Header status={status} theme={theme} onThemeChange={onThemeChange} />
-      <main className="main-content">
-        {healthQuery.isPending && <p className="connection-message" role="status">Checking server connection…</p>}
-        {healthQuery.isError && (
-          <ServerUnavailable
-            message={healthQuery.error.message}
-            onRetry={() => void healthQuery.refetch()}
-            retrying={healthQuery.isFetching}
-          />
-        )}
-        {healthQuery.isSuccess && <Outlet />}
-      </main>
+      <div className={`workspace-layout${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
+        <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed((collapsed) => !collapsed)} />
+        <main className="main-content">
+          {healthQuery.isPending && <p className="connection-message" role="status">Checking server connection…</p>}
+          {healthQuery.isError && (
+            <ServerUnavailable
+              message={healthQuery.error.message}
+              onRetry={() => void healthQuery.refetch()}
+              retrying={healthQuery.isFetching}
+            />
+          )}
+          {healthQuery.isSuccess && <Outlet />}
+        </main>
+      </div>
       <Footer />
     </div>
   )
